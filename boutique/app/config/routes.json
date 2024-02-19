@@ -1,0 +1,28 @@
+{
+  "routes": [
+    {
+      "path": "/",
+      "page": "index",
+      "routeType": "page",
+      "layout": "main"
+    },
+    {
+      "path": "/file:///C:/Users/Sherlyn%20Saspa/boutique/page//index",
+      "page": "file:///C:/Users/Sherlyn%20Saspa/boutique/page//index"
+    },
+    {
+      "path": "/file:///C:/Users/Sherlyn%20Saspa/boutique/public//index",
+      "page": "file:///C:/Users/Sherlyn%20Saspa/boutique/public//index"
+    },
+    {
+      "path": "/file:///C:/Users/Sherlyn%20Saspa/boutique/public//about",
+      "page": "file:///C:/Users/Sherlyn%20Saspa/boutique/public//about",
+      "layout": "main"
+    },
+    {
+      "path": "/file:///C:/Users/Sherlyn%20Saspa/boutique/public//contact",
+      "page": "file:///C:/Users/Sherlyn%20Saspa/boutique/public//contact",
+      "layout": "main"
+    }
+  ]
+}
