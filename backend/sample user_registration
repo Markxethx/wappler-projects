@@ -1,0 +1,281 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/register.ejs",
+      "linkedForm": "frmRegister"
+    },
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "firstname",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            }
+          }
+        },
+        "name": "firstname"
+      },
+      {
+        "type": "text",
+        "fieldName": "lastname",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            }
+          }
+        },
+        "name": "lastname"
+      },
+      {
+        "type": "text",
+        "fieldName": "email",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            },
+            "core:email": {}
+          }
+        },
+        "name": "email"
+      },
+      {
+        "type": "text",
+        "fieldName": "password",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            }
+          }
+        },
+        "name": "password"
+      },
+      {
+        "type": "text",
+        "fieldName": "password2",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            },
+            "core:equalTo": {
+              "param": "password"
+            }
+          }
+        },
+        "name": "password2"
+      },
+      {
+        "type": "text",
+        "fieldName": "fisrtname",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            }
+          }
+        },
+        "name": "fisrtname"
+      },
+      {
+        "type": "text",
+        "fieldName": "code",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            }
+          }
+        },
+        "name": "code"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "email",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "value": "{{$_POST.email.lowercase()}}"
+        },
+        "meta": [],
+        "outputType": "text"
+      },
+      {
+        "name": "validate",
+        "module": "validator",
+        "action": "validate",
+        "options": {
+          "data": [
+            {
+              "name": "validate_1",
+              "value": "{{email}}",
+              "rules": {
+                "db:notexists": {
+                  "param": {
+                    "connection": "db",
+                    "table": "users",
+                    "column": "email"
+                  }
+                }
+              },
+              "fieldName": "email"
+            }
+          ]
+        }
+      },
+      {
+        "name": "code",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "value": "{{email.sha1(email)}}"
+        },
+        "meta": [],
+        "outputType": "text"
+      },
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{code==$_POST.code}}",
+          "then": {
+            "steps": [
+              {
+                "name": "salt",
+                "module": "core",
+                "action": "setvalue",
+                "options": {
+                  "value": "{{TIMESTAMP.md5(TIMESTAMP).substr(0, 15)}}"
+                },
+                "meta": [],
+                "outputType": "text"
+              },
+              {
+                "name": "insertUser",
+                "module": "dbupdater",
+                "action": "insert",
+                "options": {
+                  "connection": "db",
+                  "sql": {
+                    "type": "insert",
+                    "values": [
+                      {
+                        "table": "users",
+                        "column": "firstname",
+                        "type": "text",
+                        "value": "{{$_POST.firstname}}"
+                      },
+                      {
+                        "table": "users",
+                        "column": "lastname",
+                        "type": "text",
+                        "value": "{{$_POST.lastname}}"
+                      },
+                      {
+                        "table": "users",
+                        "column": "email",
+                        "type": "text",
+                        "value": "{{email}}"
+                      },
+                      {
+                        "table": "users",
+                        "column": "password",
+                        "type": "text",
+                        "value": "{{$_POST.password.sha256(salt)}}"
+                      },
+                      {
+                        "table": "users",
+                        "column": "created",
+                        "type": "datetime",
+                        "value": "{{NOW}}"
+                      },
+                      {
+                        "table": "users",
+                        "column": "salt",
+                        "type": "text",
+                        "value": "{{salt}}"
+                      }
+                    ],
+                    "table": "users",
+                    "returning": "usersID",
+                    "query": "insert into `users` (`created`, `email`, `firstname`, `lastname`, `password`, `salt`) values (?, ?, ?, ?, ?, ?) returning `usersID`",
+                    "params": [
+                      {
+                        "name": ":P1",
+                        "type": "expression",
+                        "value": "{{$_POST.firstname}}",
+                        "test": ""
+                      },
+                      {
+                        "name": ":P2",
+                        "type": "expression",
+                        "value": "{{$_POST.lastname}}",
+                        "test": ""
+                      },
+                      {
+                        "name": ":P3",
+                        "type": "expression",
+                        "value": "{{email}}",
+                        "test": ""
+                      },
+                      {
+                        "name": ":P4",
+                        "type": "expression",
+                        "value": "{{$_POST.password.sha256(salt)}}",
+                        "test": ""
+                      },
+                      {
+                        "name": ":P5",
+                        "type": "expression",
+                        "value": "{{NOW}}",
+                        "test": ""
+                      },
+                      {
+                        "name": ":P6",
+                        "type": "expression",
+                        "value": "{{salt}}",
+                        "test": ""
+                      }
+                    ]
+                  }
+                },
+                "meta": [
+                  {
+                    "name": "identity",
+                    "type": "text"
+                  },
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ]
+              },
+              {
+                "name": "identity",
+                "module": "auth",
+                "action": "login",
+                "options": {
+                  "provider": "security",
+                  "username": "{{email}}",
+                  "password": "{{$_POST.password.sha256(salt)}}",
+                  "remember": 1
+                },
+                "output": true,
+                "meta": []
+              }
+            ]
+          }
+        },
+        "outputType": "boolean"
+      }
+    ]
+  }
+}
